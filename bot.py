@@ -73,6 +73,11 @@ async def callback(client, query):
             f"User ID : {user}\nTotal Upload : {total}"
         )
 
+@app.on_message(filters.command("test"))
+async def test(client, message):
+    chat = await client.get_chat(config.STORAGE_CHANNEL)
+    await message.reply(f"Channel ditemukan: {chat.title}")
+    
 @app.on_message(filters.video | filters.document | filters.audio)
 async def save_file(client, message):
 
