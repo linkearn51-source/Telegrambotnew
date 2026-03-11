@@ -242,41 +242,35 @@ async def file_button(client,query):
 @app.on_message(filters.private & (filters.video | filters.document | filters.audio))
 async def upload(client,message):
 
-    user=message.from_user.id
+    user = message.from_user.id
 
     if user not in user_files:
         return await message.reply("Klik Upload dulu")
 
-    now=time.time()
+    now = time.time()
 
     if user in upload_time:
+        if now - upload_time[user] < 5:
+            return await message.reply("⏳ Tunggu 5 detik sebelum upload lagi")
 
-        if now-upload_time[user]<5:
+    upload_time[user] = now
 
-            return await message.reply(
-                "⏳ Tunggu 5 detik sebelum upload lagi"
-            )
+    status = await message.reply("📤 Uploading ke storage...")
 
-    upload_time[user]=now
-
-    status=await message.reply("Preparing upload...")
-
-    start=time.time()
-
-    msg=await message.copy(
+    msg = await client.copy_message(
         config.STORAGE_CHANNEL,
-        progress=progress,
-        progress_args=(status,start)
+        message.chat.id,
+        message.id
     )
 
     user_files[user].append(msg.id)
 
-    total=len(user_files[user])
+    total = len(user_files[user])
 
     await status.edit(
         f"✅ Upload selesai\n"
         f"Total file: {total}"
-    )
+                      )
 
 # ================= BROADCAST =================
 
